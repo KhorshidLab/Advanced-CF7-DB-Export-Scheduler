@@ -10,7 +10,7 @@
  * Plugin Name:       Advanced CF7 DB Export Scheduler
  * Plugin URI:        https://khorshidlab.com/
  * Description:       Export Scheduler Extension for Advanced CF7 DB
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Khorshid
  * Author URI:        https://khorshidlab.com/
  * License:           GPL-2.0+

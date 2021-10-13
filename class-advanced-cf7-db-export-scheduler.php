@@ -17,7 +17,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
         global $wpdb;
         
         $this->plugin_name      = 'Advanced CF7 DB Export Scheduler';
-		$this->version          = '1.0.0';
+		$this->version          = '1.0.1';
         $this->wpdb             = $wpdb;
         $this->separator        = ",";
         $this->table            = $this->wpdb->prefix . 'cf7_vdata_entry';
