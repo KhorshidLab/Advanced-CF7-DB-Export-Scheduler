@@ -68,7 +68,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
 
     public function export_forms_settings_content() {
             
-        $forms = get_posts( [ 'post_type' => 'wpcf7_contact_form' ] );
+        $forms = get_posts( [ 'post_type' => 'wpcf7_contact_form', 'numberposts' => -1 ] );
         $reports_options  = get_option( 'kh-schedule-reports-options' );
         ?>
         <div class="wrap">
