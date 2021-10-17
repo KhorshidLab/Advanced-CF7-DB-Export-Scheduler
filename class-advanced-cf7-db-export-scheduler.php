@@ -38,6 +38,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
         add_action( 'admin_menu', [ $this, 'add_submenu_to_advanced_cf7_db_menu' ] );
         add_action( 'cf7_db_schedule_report_hook', [ $this, 'cf7_db_schedule_report_exec' ] );
         add_action( 'admin_init', [ $this, 'save_schedule_report_form' ] );
+        add_action( 'admin_init', [ $this, 'send_report_to_email' ] );
         add_action( 'plugins_loaded', $this, 'load_plugin_textdomain' );
         add_filter( 'cron_schedules', [ $this, 'add_cron_interval' ] );
 
@@ -109,6 +110,15 @@ class Advanced_Cf7_Db_Export_Scheduler {
                 </p>
 
                 <p><input type="submit" name="schedule-report-form-submit" id="submit" class="button button-primary" value="<?php _e( 'Save', 'kh-acsr' ) ?>"></p>
+            </form>
+
+            <br>
+            <hr>
+            <h3><?php _e( 'Send Report to Email', 'kh-acsr' ) ?></h3>
+            <p><?php _e( 'You can send selected forms reports to your email immediately.', 'kh-acsr' ) ?></p>
+            <form method="post">
+                <input type="email" name="email" placeholder="<?php _e( 'Enter your email address', 'kh-acsr' ) ?>">
+                <input type="submit" name="schedule-report-send-to-email" class="button button-primary" value="<?php _e( 'Send Email', 'kh-acsr' ) ?>">
             </form>
         </div>
         <?php
@@ -221,16 +231,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
         }
 
         fprintf( $fh, chr(0xEF) . chr(0xBB) . chr(0xBF) ); // UTF-8
-
-        header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-        header( 'Content-Description: File Transfer' );
-        header( 'Content-type: text/csv' );
-        header( "Content-Disposition: attachment; filename={$filename}" );
-        header( 'Expires: 0' );
-        header( 'Pragma: public' );
-
         fwrite( $fh, $csv_output );
-
         rewind( $fh );
         fclose( $fh );
 
@@ -240,12 +241,12 @@ class Advanced_Cf7_Db_Export_Scheduler {
 
     }
 
-    public function send_output_csv_to_admin_email( $attachment_path ) {
+    public function send_output_csv_to_admin_email( $attachment_path, $to = null ) {
 
         require ABSPATH . 'wp-includes/pluggable.php';
 
         $date     = date_i18n( 'j F Y', current_time( 'timestamp' ) ) . ' @ ' . date_i18n( 'H:i:s', current_time( 'timestamp' ) );
-		$to       = get_option('admin_email');
+		$to       = $to == null ? get_option('admin_email') : $to;
 		$body     = __( 'Please find the exported file of Advanced CF7 schedule reports attached to this email.', 'kh-acsr' ) . ' <br>';
         $subject  = __( 'Advanced CF7 export - Date: ', 'kh-acsr' ) . $date;
         $body    .= __( '<br> Report Date: ', 'kh-acsr' ) . $date;
@@ -314,6 +315,33 @@ class Advanced_Cf7_Db_Export_Scheduler {
 
         return $output;
 
+    }
+
+    public function send_report_to_email() {
+
+        if( isset( $_POST['schedule-report-send-to-email'] ) ) {
+            $csv_output = $this->generate_csv();
+            $send_email = $this->send_output_csv_to_admin_email( $csv_output, $_POST['email'] );
+            var_dump($send_email);die;
+            
+            if( $send_email ) {
+                add_action( 'admin_notices', function () {
+                    ?>
+                    <div class="notice notice-success is-dismissible">
+                        <p><?php _e( 'The report email sent successfully!', 'sample-text-domain' ); ?></p>
+                    </div>
+                    <?php
+                } );
+            } else {
+                add_action( 'admin_notices', function () {
+                    ?>
+                    <div class="notice notice-success is-dismissible">
+                        <p><?php _e( 'The report email sent successfully!', 'sample-text-domain' ); ?></p>
+                    </div>
+                    <?php
+                } );
+            }
+        }
     }
 
 }
