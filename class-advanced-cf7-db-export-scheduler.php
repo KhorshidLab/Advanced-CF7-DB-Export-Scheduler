@@ -91,7 +91,6 @@ class Advanced_Cf7_Db_Export_Scheduler {
                 }
                 ?>
                 <br>
-                <hr>
                 <h3><?php _e( 'Report Settings', 'kh-acsr' ) ?></h3>
 
                 <p>
@@ -115,7 +114,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
             <br>
             <hr>
             <h3><?php _e( 'Send Report to Email', 'kh-acsr' ) ?></h3>
-            <p><?php _e( 'You can send selected forms reports to your email immediately.', 'kh-acsr' ) ?></p>
+            <p><?php _e( 'You can send selected forms reports to your email immediately. Before that, make sure you have been saved your selected forms.', 'kh-acsr' ) ?></p>
             <form method="post">
                 <input type="email" name="email" placeholder="<?php _e( 'Enter your email address', 'kh-acsr' ) ?>">
                 <input type="submit" name="schedule-report-send-to-email" class="button button-primary" value="<?php _e( 'Send Email', 'kh-acsr' ) ?>">
@@ -248,7 +247,7 @@ class Advanced_Cf7_Db_Export_Scheduler {
         $date     = date_i18n( 'j F Y', current_time( 'timestamp' ) ) . ' @ ' . date_i18n( 'H:i:s', current_time( 'timestamp' ) );
 		$to       = $to == null ? get_option('admin_email') : $to;
 		$body     = __( 'Please find the exported file of Advanced CF7 schedule reports attached to this email.', 'kh-acsr' ) . ' <br>';
-        $subject  = __( 'Advanced CF7 export - Date: ', 'kh-acsr' ) . $date;
+        $subject  = __( 'Advanced CF7 Export - Date: ', 'kh-acsr' ) . $date;
         $body    .= __( '<br> Report Date: ', 'kh-acsr' ) . $date;
         $headers  = [ 'Content-Type: text/html; charset=UTF-8' ];
 
@@ -322,7 +321,6 @@ class Advanced_Cf7_Db_Export_Scheduler {
         if( isset( $_POST['schedule-report-send-to-email'] ) ) {
             $csv_output = $this->generate_csv();
             $send_email = $this->send_output_csv_to_admin_email( $csv_output, $_POST['email'] );
-            var_dump($send_email);die;
             
             if( $send_email ) {
                 add_action( 'admin_notices', function () {
@@ -335,8 +333,8 @@ class Advanced_Cf7_Db_Export_Scheduler {
             } else {
                 add_action( 'admin_notices', function () {
                     ?>
-                    <div class="notice notice-success is-dismissible">
-                        <p><?php _e( 'The report email sent successfully!', 'sample-text-domain' ); ?></p>
+                    <div class="notice notice-error is-dismissible">
+                        <p><?php _e( 'An error occurred while sending the report email!', 'sample-text-domain' ); ?></p>
                     </div>
                     <?php
                 } );
